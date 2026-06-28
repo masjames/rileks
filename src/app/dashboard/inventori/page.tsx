@@ -1,0 +1,2 @@
+import { AppShell, InventoryStatusTable } from '@/components/rileks/components';import { inventory } from '@/lib/mock/rileks-data';
+export default function Page(){return <AppShell><h1>Inventori</h1><p className="lead">Stok harian, minimum stock, dan tombol update mock.</p><div className="actions"><button className="action">Update stok beras</button><button className="action">Tandai minyak menipis</button></div><InventoryStatusTable items={inventory}/></AppShell>}

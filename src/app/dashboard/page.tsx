@@ -1,0 +1,2 @@
+import { AppShell, ActivityFeed, AttentionList, SummaryCards } from '@/components/rileks/components';import { createInitialState } from '@/lib/mock/rileks-store';
+export default function Dashboard(){const state=createInitialState();return <AppShell><h1>Dashboard Kedai Rileks Demo</h1><p className="lead">Ringkasan owner dan manager untuk operasional hari ini.</p><SummaryCards state={state}/><div className="grid cards" style={{marginTop:18}}><AttentionList/><ActivityFeed items={state.activity}/></div></AppShell>}

@@ -1,0 +1,2 @@
+import Link from 'next/link';import ChatSimulator from '@/components/rileks/ChatSimulator';
+export default function Demo(){return <div className="container"><header className="nav"><Link className="brand" href="/">Rileks</Link><Link className="pill" href="/dashboard">Buka Dashboard</Link></header><section className="section"><h1>Simulasi Operasional Hari Ini</h1><p className="lead">Lihat bagaimana staff lapor lewat chat dan manager langsung melihat update operasional.</p><ChatSimulator/></section></div>}

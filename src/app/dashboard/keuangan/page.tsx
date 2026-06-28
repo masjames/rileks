@@ -1,0 +1,2 @@
+import { AppShell, FinanceSummary } from '@/components/rileks/components';import { financeTransactions } from '@/lib/mock/rileks-data';
+export default function Page(){return <AppShell><h1>Keuangan</h1><p className="lead">Penjualan, biaya, net cash, dan closing cash harian tanpa akuntansi rumit.</p><div className="actions"><button className="action">Catat penjualan</button><button className="action">Catat biaya</button><button className="action">Catat closing</button></div><FinanceSummary transactions={financeTransactions}/></AppShell>}

@@ -1,0 +1,2 @@
+import { AppShell, TaskChecklist } from '@/components/rileks/components';import { tasks } from '@/lib/mock/rileks-data';
+export default function Page(){return <AppShell><h1>Daily Task</h1><p className="lead">Checklist opening, closing, kebersihan, dan operasional harian.</p><div className="card"><b>Tambah tugas mock</b><p className="muted">UI placeholder lokal — belum menyimpan ke backend.</p><button className="action">+ Tambah tugas closing</button></div><TaskChecklist tasks={tasks}/></AppShell>}

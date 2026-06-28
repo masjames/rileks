@@ -1,0 +1,17 @@
+export type Staff={id:string;name:string;role:string;outlet:string};
+export type Task={id:string;name:string;role:string;done:boolean;completedBy?:string;time?:string};
+export type Recipe={id:string;name:string;category:string;active:boolean;ingredients:string[];steps:string};
+export type InventoryItem={id:string;name:string;stock:number;unit:string;minimum:number;updated:string};
+export type Transaction={id:string;type:'sales'|'expense'|'closing';label:string;amount:number;time:string};
+export type Attendance={id:string;staff:string;role:string;outlet:string;checkIn?:string;checkOut?:string;status:string;location:string};
+export const tenant={name:'Kedai Rileks Demo'};
+export const outlet={name:'Outlet Utama'};
+export const staff:Staff[]=[{id:'owner',name:'Pak Owner',role:'Owner',outlet:outlet.name},{id:'manager',name:'Bu Manager',role:'Manager',outlet:outlet.name},{id:'andi',name:'Andi Staff',role:'Staff Operasional',outlet:outlet.name},{id:'sari',name:'Sari Staff',role:'Kasir',outlet:outlet.name}];
+export const tasks:Task[]=[{id:'t1',name:'Cek kebersihan area depan',role:'Opening',done:true,completedBy:'Andi Staff',time:'07:55'},{id:'t2',name:'Siapkan bahan opening',role:'Dapur',done:false},{id:'t3',name:'Foto closing area dapur',role:'Closing',done:false},{id:'t4',name:'Hitung cash closing',role:'Kasir',done:false}];
+export const recipes:Recipe[]=[{id:'r1',name:'Es Teh Manis',category:'Minuman',active:true,ingredients:['Teh: 8 gram','Gula: 20 gram','Air: 250 ml'],steps:'Seduh teh, larutkan gula, tambah es, sajikan.'},{id:'r2',name:'Nasi Goreng Rileks',category:'Makanan',active:true,ingredients:['Nasi: 180 gram','Telur: 1 butir','Bumbu rileks: 18 gram','Ayam suwir: 40 gram'],steps:'Tumis bumbu, masukkan telur dan nasi, aduk rata, sajikan hangat.'},{id:'r3',name:'Ayam Geprek',category:'Makanan',active:false,ingredients:['Ayam: 120 gram','Tepung: 45 gram','Sambal: 25 gram'],steps:'Goreng ayam tepung, geprek dengan sambal, sajikan dengan nasi.'}];
+export const inventory:InventoryItem[]=[{id:'i1',name:'Beras',stock:12,unit:'kg',minimum:5,updated:'08:00'},{id:'i2',name:'Ayam',stock:3.5,unit:'kg',minimum:2.5,updated:'08:05'},{id:'i3',name:'Gula',stock:2,unit:'kg',minimum:1.5,updated:'07:50'},{id:'i4',name:'Minyak',stock:1,unit:'liter',minimum:2,updated:'07:45'},{id:'i5',name:'Teh',stock:400,unit:'gram',minimum:250,updated:'07:40'}];
+export const financeTransactions:Transaction[]=[{id:'f1',type:'sales',label:'Penjualan lunch',amount:450000,time:'12:30'},{id:'f2',type:'expense',label:'Beli es batu',amount:30000,time:'10:10'},{id:'f3',type:'closing',label:'Closing cash',amount:750000,time:'21:00'}];
+export const attendanceLogs:Attendance[]=[{id:'a1',staff:'Pak Owner',role:'Owner',outlet:outlet.name,checkIn:'08:20',status:'Monitoring',location:'Remote'},{id:'a2',staff:'Bu Manager',role:'Manager',outlet:outlet.name,checkIn:'07:30',status:'Masuk',location:'Outlet Utama'},{id:'a3',staff:'Andi Staff',role:'Staff Operasional',outlet:outlet.name,checkIn:'08:03',status:'Masuk',location:'Outlet Utama'},{id:'a4',staff:'Sari Staff',role:'Kasir',outlet:outlet.name,status:'Belum masuk',location:'Belum ada'}];
+export const activityLogs=['Andi check-in 08:03','Tugas opening selesai','Penjualan Rp150.000 dicatat','Stok ayam diperbarui','Minyak mendekati minimum'];
+export const attentionItems=['Minyak mendekati minimum','Sari belum check-in','Closing kemarin belum lengkap'];
+export const rupiah=(n:number)=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);

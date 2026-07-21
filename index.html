@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-i18n="meta_title">rileks · absensi dan operasional lewat chat</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.cdnfonts.com/css/bogart" rel="stylesheet" />
+  <style>
+    * { box-sizing:border-box; }
+    body {
+      margin:0; background:#e5e7eb; color:#202020;
+      font-family:'DM Sans',system-ui,sans-serif; font-size:16px; line-height:1.6;
+      -webkit-font-smoothing:antialiased;
+    }
+    :root {
+      --canvas:#e5e7eb; --fg:#202020; --muted-fg:#6b7280;
+      --card:#ffffff; --oat:#e9dfd2; --border:#000;
+      --primary:#72a4f2; --primary-hover:#5b8ee0;
+      --purple:#C19BFF; --coral:#FF6433; --yellow:#FFD96E;
+      --radius:14px; --radius-sm:10px;
+      --font-head:'Bogart','Bogart Trial',system-ui,sans-serif;
+      --font-body:'DM Sans',system-ui,sans-serif;
+    }
+    .wrap { max-width:1080px; margin:0 auto; padding:0 1.5rem; }
+    .section { padding:4.5rem 0; }
+
+    h1, h2 { font-family:var(--font-head); font-weight:900; margin:0.15em 0; letter-spacing:-0.01em; }
+    h1 { font-size:clamp(2.8rem,5.5vw,4rem); line-height:1.0; }
+    h2 { font-size:clamp(1.8rem,3vw,2.4rem); line-height:1.08; }
+    h3 { font-family:var(--font-head); font-size:1.15rem; font-weight:700; margin:0.3em 0; letter-spacing:-0.005em; }
+    .lead { font-size:1.1rem; color:var(--muted-fg); max-width:46ch; }
+    .small { font-size:0.85rem; color:var(--muted-fg); }
+
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center; gap:0.4rem;
+      font-family:var(--font-body); font-size:0.9rem; font-weight:600;
+      padding:0.65rem 1.3rem; border-radius:50px; border:2px solid #000;
+      cursor:pointer; text-decoration:none; transition:background .15s, transform .1s;
+    }
+    .btn:active { transform:scale(0.97); }
+    .btn-primary { background:var(--primary); color:#fff; border-color:var(--primary); }
+    .btn-primary:hover { background:var(--primary-hover); }
+
+    .site-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:1rem 0;
+    }
+    .logo {
+      display:inline-flex; align-items:center; gap:0.5rem;
+      font-family:var(--font-head); font-weight:900; font-size:1.3rem;
+      color:var(--fg); text-decoration:none;
+    }
+    .logo-mark { width:26px; height:26px; flex:none; }
+    .nav { display:flex; gap:1.5rem; align-items:center; }
+    .nav a:not(.btn) { color:var(--muted-fg); text-decoration:none; font-size:0.92rem; font-weight:500; }
+    .nav a:not(.btn):hover { color:var(--fg); }
+
+    .lang-btn {
+      position:relative; cursor:pointer; display:inline-flex; align-items:center; gap:0.2rem;
+      font-family:var(--font-body); font-size:0.8rem; font-weight:600;
+      padding:0.2rem 0.5rem; border:2px solid #000; border-radius:6px;
+      background:var(--card); color:var(--fg); user-select:none;
+    }
+    .lang-btn:hover { background:var(--oat); }
+    .lang-menu {
+      display:none; position:absolute; top:100%; right:0; margin-top:2px;
+      background:var(--card); border:2px solid #000; border-radius:6px; z-index:100; min-width:50px;
+    }
+    .lang-btn.open .lang-menu { display:block; }
+    .lang-menu div {
+      padding:0.3rem 0.6rem; cursor:pointer; font-size:0.8rem; font-weight:600;
+    }
+    .lang-menu div:hover { background:var(--oat); }
+    .lang-menu div.active { background:var(--purple); color:#fff; }
+
+    .hero { text-align:center; padding:3rem 0 4.5rem; }
+    .hero .lead { margin:0.8rem auto 0; }
+    .hero-ph { max-width:280px; margin:0 auto 2rem; }
+    .chat-frame {
+      background:var(--card); border:3px solid #000; border-radius:20px;
+      padding:1.25rem 1rem; box-shadow:8px 8px 0 #000;
+      display:flex; flex-direction:column; gap:0.5rem;
+      font-size:0.85rem; text-align:left;
+    }
+    .chat-bar {
+      display:flex; gap:0.3rem; align-items:center; margin-bottom:0.4rem;
+    }
+    .chat-dot { width:8px; height:8px; border-radius:50%; border:2px solid #000; }
+    .chat-bubble {
+      background:#e5e7eb; border:2px solid #000; border-radius:12px;
+      padding:0.5rem 0.8rem; width:fit-content; max-width:85%;
+    }
+    .chat-bubble.self { background:var(--purple); color:#fff; margin-left:auto; }
+    .task-row { display:flex; gap:0.3rem; flex-wrap:wrap; }
+    .task-chip {
+      background:var(--card); border:2px solid #000; border-radius:6px;
+      padding:0.15rem 0.45rem; font-size:0.65rem;
+    }
+
+    .waitlist { display:flex; gap:0.5rem; max-width:420px; margin:1.2rem auto 0; }
+    .input {
+      flex:1; font-size:1rem; padding:0.65rem 0.9rem; border-radius:50px;
+      border:2px solid #000; background:var(--card); color:var(--fg);
+      font-family:var(--font-body); outline:none;
+    }
+    .input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(114,164,242,0.2); }
+    @media(max-width:480px){ .waitlist{flex-direction:column;} }
+
+    .section-head { text-align:center; margin-bottom:2.5rem; }
+
+    .screens-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+    .article {
+      background:var(--card); border:3px solid #000; border-radius:var(--radius);
+      padding:1.5rem; display:flex; align-items:center; gap:1.5rem;
+    }
+    .ph-card-img {
+      width:110px; height:240px; flex-shrink:0; border-radius:var(--radius-sm);
+      border:2px solid #000; background:var(--oat);
+      display:flex; align-items:center; justify-content:center;
+      font-size:0.65rem; text-align:center; padding:0.5rem; font-weight:500;
+    }
+    .article-body { flex:1; }
+    .article-body p { font-size:0.9rem; color:var(--muted-fg); margin:0; }
+    @media(max-width:640px){
+      .screens-grid{grid-template-columns:1fr;}
+      .article{flex-direction:column;text-align:center;}
+      .ph-card-img{width:90px;height:190px;}
+    }
+
+    .steps { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; }
+    .step-card {
+      background:var(--oat); border:3px solid #000; border-radius:var(--radius);
+      padding:1.75rem 1.5rem; text-align:center;
+    }
+    .step-card p { font-size:0.9rem; color:var(--fg); margin:0; }
+    .step-num {
+      width:36px; height:36px; border-radius:50%; background:var(--card);
+      border:2px solid #000; display:inline-flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:0.9rem; margin-bottom:0.75rem;
+    }
+    @media(max-width:640px){ .steps{grid-template-columns:1fr;} }
+
+    .pricing-card {
+      background:var(--card); border:3px solid #000; border-radius:var(--radius);
+      padding:2rem; max-width:380px; margin:0 auto; text-align:center;
+      box-shadow:10px 10px 0 #000;
+    }
+    .price { font-family:var(--font-head); font-size:2.5rem; font-weight:900; }
+    .price-sub { font-size:0.9rem; color:var(--muted-fg); margin-top:0.2rem; }
+
+    .accordion { max-width:640px; margin:0 auto; }
+    .accordion details {
+      border-bottom:2px solid #000; padding:1rem 0;
+    }
+    .accordion summary {
+      cursor:pointer; font-weight:600; list-style:none; display:flex;
+      justify-content:space-between; align-items:center; font-size:0.95rem;
+    }
+    .accordion summary::-webkit-details-marker { display:none; }
+    .accordion summary::after { content:"+"; font-size:1.2rem; font-weight:700; }
+    .accordion details[open] summary::after { content:"\2212"; }
+    .accordion p { color:var(--muted-fg); margin:0.6rem 0 0; font-size:0.9rem; }
+
+    .site-footer {
+      border-top:3px solid #000; padding:2rem 0; margin-top:2rem;
+      color:var(--muted-fg); font-size:0.85rem;
+      display:flex; flex-direction:column; align-items:center; gap:0.4rem; text-align:center;
+    }
+    .site-footer .bottom-row { display:flex; align-items:center; gap:1rem; }
+    .site-footer a { color:var(--muted-fg); text-decoration:underline; }
+    .site-footer a:hover { color:var(--fg); }
+    .site-footer .lang-btn { padding:0.15rem 0.4rem; font-size:0.75rem; }
+
+    a:focus-visible, .input:focus-visible, summary:focus-visible { outline:3px solid var(--purple); outline-offset:2px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="site-header">
+      <a class="logo" href="#top">
+        <svg class="logo-mark" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="24" height="24" rx="6" fill="#C19BFF" stroke="#000" stroke-width="2.5"/>
+          <path d="M8 14l3 3 7-7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>rileks</span>
+      </a>
+      <nav class="nav">
+        <a href="#faq" data-i18n="nav_faq">FAQ</a>
+        <a href="#get" class="btn btn-primary" data-i18n="nav_daftar">Daftar</a>
+        <div class="lang-btn" id="langBtnTop" tabindex="0" role="button" aria-haspopup="true" onclick="toggleLang(this)">
+          <span class="lang-label">ID</span>
+          <span>▼</span>
+          <div class="lang-menu">
+            <div class="active" data-lang="id" onclick="switchLang('id');event.stopPropagation();">ID</div>
+            <div data-lang="en" onclick="switchLang('en');event.stopPropagation();">EN</div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <section class="hero" id="top">
+      <div class="hero-ph">
+        <div class="chat-frame">
+          <div class="chat-bar">
+            <span class="chat-dot" style="background:#FF6433;"></span>
+            <span class="chat-dot" style="background:#FFD96E;"></span>
+            <span class="chat-dot" style="background:#72a4f2;"></span>
+            <span style="font-size:0.7rem;font-weight:600;margin-left:0.3rem;">Telegram</span>
+          </div>
+          <div class="chat-bubble" data-i18n="chat_hello">Halo! Tap Masuk untuk absen</div>
+          <div class="chat-bubble self" data-i18n="chat_masuk">Masuk</div>
+          <div class="task-row">
+            <span class="task-chip" data-i18n="task1">Bersihkan meja</span>
+            <span class="task-chip" data-i18n="task2">Stok minuman</span>
+          </div>
+          <div class="chat-bubble self" style="background:#202020;" data-i18n="chat_keluar">Keluar</div>
+        </div>
+        <div class="small" style="margin-top:0.5rem;" data-i18n="chat_sub">+ 5 staff sudah absen hari ini</div>
+      </div>
+      <h1 data-i18n="hero_title">Staff lapor lewat chat.<br />Anda tahu kondisi outlet.</h1>
+      <p class="lead" data-i18n="hero_sub">Absen dan tugas harian lewat Telegram. Tanpa install apapun. Real-time.</p>
+      <form class="waitlist" action="#" onsubmit="event.preventDefault();var i=this.querySelector('input');if(i.value){alert(document.documentElement.lang==='en'?'Thanks! We will reach out.':'Terima kasih! Kami akan hubungi Anda.');i.value='';}">
+        <input class="input" type="text" data-i18n-placeholder="input_placeholder" placeholder="Email atau nomor WA" required />
+        <button class="btn btn-primary" type="submit" data-i18n="btn_daftar">Daftar akses awal</button>
+      </form>
+      <div class="small" style="margin-top:0.5rem;" data-i18n="hero_nospam">Satu pesan saat sudah siap. Tanpa spam.</div>
+    </section>
+
+    <section class="section" id="field">
+      <div class="section-head">
+        <h2 data-i18n="section1_title">Kepala Anda bukan sistem absensi.</h2>
+      </div>
+      <div class="screens-grid">
+        <article class="article">
+          <div class="ph-card-img" data-i18n="card1_img">Anda nggak di outlet, siapa yang masuk?</div>
+          <div class="article-body">
+            <h3 data-i18n="card1_title">Buta absensi</h3>
+            <p data-i18n="card1_body">Anda nggak tahu siapa yang masuk hari ini. Grup WA penuh, kertas absensi hilang.</p>
+          </div>
+        </article>
+        <article class="article">
+          <div class="ph-card-img" data-i18n="card2_img">Checklist tutup toko: sudah atau belum?</div>
+          <div class="article-body">
+            <h3 data-i18n="card2_title">Checklist tanpa bukti</h3>
+            <p data-i18n="card2_body">Anda cuma bisa percaya "katanya sudah". Tugas harian kelewat tanpa ada yang tahu.</p>
+          </div>
+        </article>
+        <article class="article">
+          <div class="ph-card-img" data-i18n="card3_img">Chat WA + kertas = kacau balau</div>
+          <div class="article-body">
+            <h3 data-i18n="card3_title">Data berantakan</h3>
+            <p data-i18n="card3_body">Grup WA banjir chat, kertas absensi hilang. Nggak ada catatan rapi yang bisa dicek.</p>
+          </div>
+        </article>
+        <article class="article">
+          <div class="ph-card-img" data-i18n="card4_img">Aplikasi HRIS? Staff bandel install</div>
+          <div class="article-body">
+            <h3 data-i18n="card4_title">Staff nggak akan install</h3>
+            <p data-i18n="card4_body">Download, bikin akun, belajar. Turnover tinggi = ribet tiap ada orang baru. Rileks cukup lewat chat.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" id="cara" style="background:var(--oat);border:3px solid #000;border-left:none;border-right:none;">
+      <div class="section-head">
+        <h2 data-i18n="section2_title">Cara kerja</h2>
+      </div>
+      <div class="steps">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h3 data-i18n="step1_title">Staff absen lewat chat</h3>
+          <p data-i18n="step1_body">Buka Telegram (sudah ada), tap "Masuk". Telat dihitung otomatis.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h3 data-i18n="step2_title">Kerjakan tugas harian</h3>
+          <p data-i18n="step2_body">Tiap tugas di-tap kalau selesai. Tap "Keluar" saat pulang, yang belum beres ketahuan.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h3 data-i18n="step3_title">Anda lihat semuanya</h3>
+          <p data-i18n="step3_body">Dashboard update real-time: siapa masuk, tugas selesai berapa, apa yang perlu perhatian.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="harga">
+      <div class="section-head">
+        <h2 data-i18n="section3_title">Mulai dari</h2>
+      </div>
+      <div class="pricing-card">
+        <div class="price">Rp149.000</div>
+        <div class="price-sub" data-i18n="pricing_sub">per bulan &middot; 1 outlet &middot; sampai 15 staff</div>
+        <p class="small" style="margin-top:1rem;" data-i18n="pricing_note1">Bayar per triwulan. Tahunan lebih hemat (~16%). Harga naik sesuai staff &amp; outlet.</p>
+        <p class="small" data-i18n="pricing_note2">Fokus absensi, tugas harian, shift. Bukan payroll atau BPJS. Makanya lebih murah.</p>
+        <a href="#get" class="btn btn-primary" style="margin-top:1.2rem;" data-i18n="pricing_cta">Daftar akses awal</a>
+      </div>
+    </section>
+
+    <section class="section" id="get" style="text-align:center;">
+      <h2 data-i18n="cta_title">Mau tahu kondisi outlet tanpa harus di tempat?</h2>
+      <form class="waitlist" action="#" onsubmit="event.preventDefault();var i=this.querySelector('input');if(i.value){alert(document.documentElement.lang==='en'?'Thanks! We will reach out.':'Terima kasih! Kami akan hubungi Anda.');i.value='';}">
+        <input class="input" type="text" data-i18n-placeholder="input_placeholder" placeholder="Email atau nomor WA" required />
+        <button class="btn btn-primary" type="submit" data-i18n="btn_daftar">Daftar akses awal</button>
+      </form>
+      <div class="small" style="margin-top:0.5rem;" data-i18n="cta_sub">Kami kirim satu pesan saat sudah siap dicoba.</div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="section-head">
+        <h2 data-i18n="faq_title">Pertanyaan</h2>
+      </div>
+      <div class="accordion">
+        <details open>
+          <summary data-i18n="faq1_q">Staff harus install aplikasi?</summary>
+          <p data-i18n="faq1_a">Tidak. Cukup buka Telegram yang sudah ada di HP mereka.</p>
+        </details>
+        <details>
+          <summary data-i18n="faq2_q">Ini aplikasi absensi biasa?</summary>
+          <p data-i18n="faq2_a">Bukan. Aplikasi absensi biasa mengharuskan staff download dan bikin akun. Rileks lewat chat, staff tinggal tap tombol.</p>
+        </details>
+        <details>
+          <summary data-i18n="faq3_q">Apa bedanya dengan grup WA?</summary>
+          <p data-i18n="faq3_a">Grup WA banjir chat dan susah ditarik laporan. Rileks otomatis mencatat absensi dan tugas.</p>
+        </details>
+        <details>
+          <summary data-i18n="faq4_q">Apakah ini termasuk payroll / BPJS?</summary>
+          <p data-i18n="faq4_a">Tidak. Rileks fokus absensi, tugas harian, dan shift. Payroll dan BPJS urusan terpisah.</p>
+        </details>
+        <details>
+          <summary data-i18n="faq5_q">Kapan tersedia?</summary>
+          <p data-i18n="faq5_a">Masih tahap awal. Daftar akses awal di atas, kami kirim email/WA saat siap dicoba.</p>
+        </details>
+        <details>
+          <summary data-i18n="faq6_q">Berapa biaya untuk lebih dari 15 staff?</summary>
+          <p data-i18n="faq6_a">Growth (40 staff, 3 outlet) Rp349k. Business (100 staff, 8 outlet) Rp699k. Enterprise kustom mulai Rp1,2jt.</p>
+        </details>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <span class="logo" style="font-size:1rem;">
+        <svg class="logo-mark" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="24" height="24" rx="6" fill="#C19BFF" stroke="#000" stroke-width="2.5"/>
+          <path d="M8 14l3 3 7-7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>rileks</span>
+      </span>
+      <div class="bottom-row">
+        <span>Malang &middot; <a href="mailto:hello@rileks.id">hello@rileks.id</a></span>
+        <div class="lang-btn" id="langBtnBottom" tabindex="0" role="button" aria-haspopup="true" onclick="toggleLang(this)">
+          <span class="lang-label">ID</span>
+          <span>▼</span>
+          <div class="lang-menu">
+            <div class="active" data-lang="id" onclick="switchLang('id');event.stopPropagation();">ID</div>
+            <div data-lang="en" onclick="switchLang('en');event.stopPropagation();">EN</div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+  var translations = {
+    "meta_title": { "id": "rileks \u00b7 absensi dan operasional lewat chat", "en": "rileks \u00b7 attendance & operations through chat" },
+    "nav_faq": { "id": "FAQ", "en": "FAQ" },
+    "nav_daftar": { "id": "Daftar", "en": "Sign up" },
+    "chat_hello": { "id": "Halo! Tap Masuk untuk absen", "en": "Hi! Tap Check-in to start" },
+    "chat_masuk": { "id": "Masuk", "en": "Check-in" },
+    "task1": { "id": "Bersihkan meja", "en": "Clean tables" },
+    "task2": { "id": "Stok minuman", "en": "Stock drinks" },
+    "chat_keluar": { "id": "Keluar", "en": "Check-out" },
+    "chat_sub": { "id": "+ 5 staff sudah absen hari ini", "en": "+ 5 staff checked in today" },
+    "hero_title": { "id": "Staff lapor lewat chat.<br />Anda tahu kondisi outlet.", "en": "Staff report via chat.<br />You see what's happening." },
+    "hero_sub": { "id": "Absen dan tugas harian lewat Telegram. Tanpa install apapun. Real-time.", "en": "Attendance & daily tasks on Telegram. No app to install. Real-time." },
+    "input_placeholder": { "id": "Email atau nomor WA", "en": "Email or WA number" },
+    "btn_daftar": { "id": "Daftar akses awal", "en": "Get early access" },
+    "hero_nospam": { "id": "Satu pesan saat sudah siap. Tanpa spam.", "en": "One message when ready. No spam." },
+    "section1_title": { "id": "Kepala Anda bukan sistem absensi.", "en": "Your head is not an attendance system." },
+    "card1_img": { "id": "Anda nggak di outlet, siapa yang masuk?", "en": "You're not at the outlet, who showed up?" },
+    "card1_title": { "id": "Buta absensi", "en": "Attendance blindspot" },
+    "card1_body": { "id": "Anda nggak tahu siapa yang masuk hari ini. Grup WA penuh, kertas absensi hilang.", "en": "You don't know who clocked in. WA groups are chaos, paper logs go missing." },
+    "card2_img": { "id": "Checklist tutup toko: sudah atau belum?", "en": "Closing checklist: done or not?" },
+    "card2_title": { "id": "Checklist tanpa bukti", "en": "Checklist with no proof" },
+    "card2_body": { "id": "Anda cuma bisa percaya \"katanya sudah\". Tugas harian kelewat tanpa ada yang tahu.", "en": "You just have to trust \"they said so\". Daily tasks slip by unnoticed." },
+    "card3_img": { "id": "Chat WA + kertas = kacau balau", "en": "WA chats + paper = total mess" },
+    "card3_title": { "id": "Data berantakan", "en": "Messy data" },
+    "card3_body": { "id": "Grup WA banjir chat, kertas absensi hilang. Nggak ada catatan rapi yang bisa dicek.", "en": "WA groups flood, paper logs vanish. No clean record to review." },
+    "card4_img": { "id": "Aplikasi HRIS? Staff bandel install", "en": "HRIS app? Staff won't install it" },
+    "card4_title": { "id": "Staff nggak akan install", "en": "Staff won't install apps" },
+    "card4_body": { "id": "Download, bikin akun, belajar. Turnover tinggi = ribet tiap ada orang baru. Rileks cukup lewat chat.", "en": "Download, register, learn. High turnover = painful repeat. Rileks works through chat." },
+    "section2_title": { "id": "Cara kerja", "en": "How it works" },
+    "step1_title": { "id": "Staff absen lewat chat", "en": "Staff check in via chat" },
+    "step1_body": { "id": "Buka Telegram (sudah ada), tap \"Masuk\". Telat dihitung otomatis.", "en": "Open Telegram (already installed), tap \"Check-in\". Late? Auto-calculated." },
+    "step2_title": { "id": "Kerjakan tugas harian", "en": "Complete daily tasks" },
+    "step2_body": { "id": "Tiap tugas di-tap kalau selesai. Tap \"Keluar\" saat pulang, yang belum beres ketahuan.", "en": "Tap tasks done. Tap \"Check-out\" when leaving -- unfinished tasks are flagged." },
+    "step3_title": { "id": "Anda lihat semuanya", "en": "You see everything" },
+    "step3_body": { "id": "Dashboard update real-time: siapa masuk, tugas selesai berapa, apa yang perlu perhatian.", "en": "Dashboard updates live: who's in, task completion, what needs attention." },
+    "section3_title": { "id": "Mulai dari", "en": "Starting from" },
+    "pricing_sub": { "id": "per bulan \u00b7 1 outlet \u00b7 sampai 15 staff", "en": "per month \u00b7 1 outlet \u00b7 up to 15 staff" },
+    "pricing_note1": { "id": "Bayar per triwulan. Tahunan lebih hemat (~16%). Harga naik sesuai staff & outlet.", "en": "Quarterly billing. Annual saves ~16%. Scales with staff & outlets." },
+    "pricing_note2": { "id": "Fokus absensi, tugas harian, shift. Bukan payroll atau BPJS. Makanya lebih murah.", "en": "Attendance, tasks, shifts. Not payroll or BPJS. That's why it's cheaper." },
+    "pricing_cta": { "id": "Daftar akses awal", "en": "Get early access" },
+    "cta_title": { "id": "Mau tahu kondisi outlet tanpa harus di tempat?", "en": "Want to know your outlet's status without being there?" },
+    "cta_sub": { "id": "Kami kirim satu pesan saat sudah siap dicoba.", "en": "We'll send one message when it's ready to try." },
+    "faq_title": { "id": "Pertanyaan", "en": "Questions" },
+    "faq1_q": { "id": "Staff harus install aplikasi?", "en": "Do staff need to install an app?" },
+    "faq1_a": { "id": "Tidak. Cukup buka Telegram yang sudah ada di HP mereka.", "en": "No. Just open Telegram, which they already have on their phone." },
+    "faq2_q": { "id": "Ini aplikasi absensi biasa?", "en": "Is this a regular attendance app?" },
+    "faq2_a": { "id": "Bukan. Aplikasi absensi biasa mengharuskan staff download dan bikin akun. Rileks lewat chat, staff tinggal tap tombol.", "en": "No. Regular apps require download and signup. Rileks works in chat -- just tap a button." },
+    "faq3_q": { "id": "Apa bedanya dengan grup WA?", "en": "What's the difference with a WA group?" },
+    "faq3_a": { "id": "Grup WA banjir chat dan susah ditarik laporan. Rileks otomatis mencatat absensi dan tugas.", "en": "WA groups flood and are hard to report from. Rileks logs attendance and tasks automatically." },
+    "faq4_q": { "id": "Apakah ini termasuk payroll / BPJS?", "en": "Does this include payroll / BPJS?" },
+    "faq4_a": { "id": "Tidak. Rileks fokus absensi, tugas harian, dan shift. Payroll dan BPJS urusan terpisah.", "en": "No. Rileks focuses on attendance, tasks, and shifts. Payroll and BPJS are separate." },
+    "faq5_q": { "id": "Kapan tersedia?", "en": "When will it be available?" },
+    "faq5_a": { "id": "Masih tahap awal. Daftar akses awal di atas, kami kirim email/WA saat siap dicoba.", "en": "Early stage. Sign up above and we'll email/WA you when it's ready." },
+    "faq6_q": { "id": "Berapa biaya untuk lebih dari 15 staff?", "en": "Pricing for more than 15 staff?" },
+    "faq6_a": { "id": "Growth (40 staff, 3 outlet) Rp349k. Business (100 staff, 8 outlet) Rp699k. Enterprise kustom mulai Rp1,2jt.", "en": "Growth (40 staff, 3 outlets) Rp349k. Business (100 staff, 8 outlets) Rp699k. Enterprise from Rp1.2M." },
+    "footer_credit": { "id": "Malang \u00b7", "en": "Malang \u00b7" }
+  };
+
+  function switchLang(locale) {
+    document.documentElement.lang = locale;
+    localStorage.setItem('rileks_lang', locale);
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      if (translations[key] && translations[key][locale]) {
+        el.innerHTML = translations[key][locale];
+      }
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n-placeholder');
+      if (translations[key] && translations[key][locale]) {
+        el.placeholder = translations[key][locale];
+      }
+    });
+    document.querySelectorAll('.lang-label').forEach(function(el) {
+      el.textContent = locale.toUpperCase();
+    });
+    document.querySelectorAll('.lang-menu div').forEach(function(el) {
+      el.classList.toggle('active', el.getAttribute('data-lang') === locale);
+    });
+  }
+
+  function toggleLang(btn) {
+    btn.classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.lang-btn')) {
+      document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.remove('open'); });
+    }
+  });
+
+  var saved = localStorage.getItem('rileks_lang') || 'id';
+  switchLang(saved);
+  </script>
+</body>
+</html>
